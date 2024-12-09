@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 LED Control</title>
+</head>
+<body>
+    <h1>ESP32 LED Control</h1>
+    <button onclick="controlLED('on')">Turn ON LED</button>
+    <button onclick="controlLED('off')">Turn OFF LED</button>
+    <p id="status"></p>
+
+    <script>
+        async function controlLED(state) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = 'Sending request...';
+
+            try {
+                const response = await fetch('/control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ state })
+                });
+
+                if (response.ok) {
+                    const data = await response.text();
+                    statusElement.textContent = `LED is now ${state.toUpperCase()}. Response: ${data}`;
+                } else {
+                    statusElement.textContent = 'Failed to communicate with ESP32.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusElement.textContent = 'Error occurred while sending the request.';
+            }
+        }
+    </script>
+</body>
+</html>
